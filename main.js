@@ -1,6 +1,7 @@
 // Mainly from https://github.com/ncase/sight-and-light 
+
 // Find intersection of RAY & SEGMENT
-function getIntersection(ray,segment){
+function getIntersection(ray,segment) {
 	// RAY in parametric: Point + Delta*T1
 	let r_px = ray.a.x;
 	let r_py = ray.a.y;
@@ -14,7 +15,7 @@ function getIntersection(ray,segment){
 	// Are they parallel? If so, no intersect
 	let r_mag = Math.sqrt(r_dx*r_dx+r_dy*r_dy);
 	let s_mag = Math.sqrt(s_dx*s_dx+s_dy*s_dy);
-	if(r_dx/r_mag==s_dx/s_mag && r_dy/r_mag==s_dy/s_mag){
+	if(r_dx/r_mag==s_dx/s_mag && r_dy/r_mag==s_dy/s_mag) {
 		// Unit vectors are the same.
 		return null;
 	}
@@ -35,37 +36,38 @@ function getIntersection(ray,segment){
 		param: T1
 	};
 }
-///////////////////////////////////////////////////////
+
 // DRAWING
 let canvas = document.getElementById("canvas");
+canvas.width = document.body.clientWidth;
+canvas.height = document.body.clientHeight;
+
 let ctx = canvas.getContext("2d");
-function draw(){
+function draw() {
 	// Clear canvas
-	ctx.clearRect(0,0,canvas.width,canvas.height);
-	// Draw segments
-	ctx.strokeStyle = "#999";
-	for(let i=0;i<segments.length;i++){
-		let seg = segments[i];
-		ctx.beginPath();
-		ctx.moveTo(seg.a.x,seg.a.y);
-		ctx.lineTo(seg.b.x,seg.b.y);
-		ctx.stroke();
-	}
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	// // Draw segments
+	// ctx.strokeStyle = "#999";
+	// for(let i=0;i<segments.length;i++) {
+	// 	let seg = segments[i];
+	// 	ctx.beginPath();
+	// 	ctx.moveTo(seg.a.x,seg.a.y);
+	// 	ctx.lineTo(seg.b.x,seg.b.y);
+	// 	ctx.stroke();
+	// }
 	// Get all unique points
-	let points = (function(segments){
+	let points = (segments => {
 		let a = [];
-		segments.forEach(function(seg){
-			a.push(seg.a,seg.b);
-		});
+		segments.forEach(seg => { a.push(seg.a,seg.b); });
 		return a;
 	})(segments);
-	let uniquePoints = (function(points){
+	let uniquePoints = (points => {
 		let set = {};
-		return points.filter(function(p){
+		return points.filter(p => {
 			let key = p.x+","+p.y;
-			if(key in set){
+			if (key in set) {
 				return false;
-			}else{
+			} else {
 				set[key]=true;
 				return true;
 			}
@@ -73,7 +75,7 @@ function draw(){
 	})(points);
 	// Get all angles
 	let uniqueAngles = [];
-	for(let j=0;j<uniquePoints.length;j++){
+	for(let j=0;j<uniquePoints.length;j++) {
 		let uniquePoint = uniquePoints[j];
 		let angle = Math.atan2(uniquePoint.y-Mouse.y,uniquePoint.x-Mouse.x);
 		uniquePoint.angle = angle;
@@ -81,7 +83,7 @@ function draw(){
 	}
 	// RAYS IN ALL DIRECTIONS
 	let intersects = [];
-	for(let j=0;j<uniqueAngles.length;j++){
+	for(let j=0;j<uniqueAngles.length;j++) {
 		let angle = uniqueAngles[j];
 		// Calculate dx & dy from angle
 		let dx = Math.cos(angle);
@@ -93,10 +95,10 @@ function draw(){
 		};
 		// Find CLOSEST intersection
 		let closestIntersect = null;
-		for(let i=0;i<segments.length;i++){
+		for(let i=0;i<segments.length;i++) {
 			let intersect = getIntersection(ray,segments[i]);
 			if(!intersect) continue;
-			if(!closestIntersect || intersect.param<closestIntersect.param){
+			if(!closestIntersect || intersect.param<closestIntersect.param) {
 				closestIntersect=intersect;
 			}
 		}
@@ -107,35 +109,34 @@ function draw(){
 		intersects.push(closestIntersect);
 	}
 	// Sort intersects by angle
-	intersects = intersects.sort(function(a,b){
-		return a.angle-b.angle;
-	});
+	intersects = intersects.sort((a, b) => a.angle - b.angle);
 	// DRAW AS A GIANT POLYGON
-	ctx.fillStyle = "#dd3838";
+	ctx.fillStyle = "#111";
 	ctx.beginPath();
 	ctx.moveTo(intersects[0].x,intersects[0].y);
-	for(let i=1;i<intersects.length;i++){
+	for(let i=1;i<intersects.length;i++) {
 		let intersect = intersects[i];
 		ctx.lineTo(intersect.x,intersect.y);
 	}
 	ctx.fill();
-	// DRAW DEBUG LINES
-	ctx.strokeStyle = "#f55";
-	for(let i=0;i<intersects.length;i++){
-		let intersect = intersects[i];
-		ctx.beginPath();
-		ctx.moveTo(Mouse.x,Mouse.y);
-		ctx.lineTo(intersect.x,intersect.y);
-		ctx.stroke();
-	}
+	// // DRAW DEBUG LINES
+	// ctx.strokeStyle = "#f55";
+	// for(let i=0;i<intersects.length;i++) {
+	// 	let intersect = intersects[i];
+	// 	ctx.beginPath();
+	// 	ctx.moveTo(Mouse.x,Mouse.y);
+	// 	ctx.lineTo(intersect.x,intersect.y);
+	// 	ctx.stroke();
+	// }
 }
+
 // LINE SEGMENTS
 let segments = [
 	// Border
-	{a:{x:0,y:0}, b:{x:640,y:0}},
-	{a:{x:640,y:0}, b:{x:640,y:360}},
-	{a:{x:640,y:360}, b:{x:0,y:360}},
-	{a:{x:0,y:360}, b:{x:0,y:0}},
+	{a:{x:0,y:0}, b:{x:canvas.width,y:0}},
+	{a:{x:canvas.width,y:0}, b:{x:canvas.width,y:canvas.height}},
+	{a:{x:canvas.width,y:canvas.height}, b:{x:0,y:canvas.height}},
+	{a:{x:0,y:canvas.height}, b:{x:0,y:0}},
 	// Polygon #1
 	{a:{x:100,y:150}, b:{x:120,y:50}},
 	{a:{x:120,y:50}, b:{x:200,y:80}},
@@ -164,25 +165,27 @@ let segments = [
 	{a:{x:580,y:50}, b:{x:480,y:150}},
 	{a:{x:480,y:150}, b:{x:400,y:95}}
 ];
+
 // DRAW LOOP
 window.requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.msRequestAnimationFrame;
 let updateCanvas = true;
-function drawLoop(){
-    requestAnimationFrame(drawLoop);
-    if(updateCanvas){
-    	draw();
-    	updateCanvas = false;
-    }
+function drawLoop() {
+  requestAnimationFrame(drawLoop);
+  if (updateCanvas) {
+    draw();
+    updateCanvas = false;
+  }
 }
-window.onload = function(){
+window.onload = function() {
 	drawLoop();
 };
+
 // MOUSE	
 let Mouse = {
 	x: canvas.width/2,
 	y: canvas.height/2
 };
-canvas.onmousemove = function(event){	
+canvas.onmousemove = function(event) {	
 	Mouse.x = event.clientX;
 	Mouse.y = event.clientY;
 	updateCanvas = true;
