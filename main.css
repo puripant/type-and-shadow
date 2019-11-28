@@ -1,0 +1,13 @@
+@import url(webfonts/stylesheet.css);
+
+body {
+  font: normal 16px 'Noto Sans Thai UI', sans-serif;
+  margin : 0px;
+  overflow: hidden;
+  background: #eee;
+}
+#canvas {
+  width: 640px;
+  height: 360px;
+  background: #fff;
+}
