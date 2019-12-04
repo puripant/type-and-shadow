@@ -111,7 +111,7 @@ function draw() {
   // Sort intersects by angle
   intersects = intersects.sort((a, b) => a.angle - b.angle);
   // DRAW AS A GIANT POLYGON
-  ctx.fillStyle = "#111";
+  ctx.fillStyle = "#222";
   ctx.beginPath();
   ctx.moveTo(intersects[0].x,intersects[0].y);
   for(let i=1;i<intersects.length;i++) {
